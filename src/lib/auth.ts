@@ -24,7 +24,6 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
   },
-
   pages: {
     signIn: '/login',
   },
@@ -38,7 +37,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       const dbUserResult = (await fetchRedis('get', `user:${user?.id}`)) as string | null;
 
-      const dbUser = dbUserResult ? JSON.parse(dbUserResult) : null;
+      const dbUser = (dbUserResult ? JSON.parse(dbUserResult) : null) as User | null;
 
       if (!dbUser) {
         if (user) {
