@@ -102,9 +102,11 @@ export async function Sidebar({ className }: SidebarProps) {
               </div>
 
               <span className="sr-only">Your profile</span>
-              <div className="flex flex-col">
-                <span aria-hidden="true">{session.user.name}</span>
-                <span className="text-xs text-zinc-400" aria-hidden="true">
+              <div className="flex flex-col max-w-[140px]">
+                <span className="truncate" aria-hidden="true">
+                  {session.user.name}
+                </span>
+                <span className="text-xs text-zinc-400  truncate" aria-hidden="true">
                   {session.user.email}
                 </span>
               </div>
