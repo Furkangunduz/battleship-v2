@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Icons } from './Icons';
 import Image from 'next/image';
@@ -17,14 +17,20 @@ const sidebarOptions: SidebarOption[] = [
   {
     id: 1,
     name: 'Add friend',
-    href: '/dashboard/add',
+    href: '/dashboard/add-friend',
     Icon: 'UserPlus2',
   },
   {
     id: 2,
-    name: 'Friend requests',
-    href: '/dashboard/requests',
+    name: 'Incoming Friend requests',
+    href: '/dashboard/incoming-friend-requests',
     Icon: 'Loader2',
+  },
+  {
+    id: 3,
+    name: 'Outgoing friend requests',
+    href: '/dashboard/outgoing-friend-requests',
+    Icon: 'User2',
   },
 ];
 
@@ -40,16 +46,21 @@ export async function Sidebar({ className }: SidebarProps) {
           <ScrollArea className="h-[350px] px-1">
             <div className="space-y-1 p-2">
               {new Array(10).fill(0).map((friend, i) => (
-                <Button
+                <Link
                   key={`$friend-${i}`}
-                  variant="ghost"
-                  className="w-full flex gap-2 justify-start font-normal hover:text-indigo-600 group"
+                  href={`/dashboard/friend/${i}`}
+                  className={cn(
+                    buttonVariants({
+                      variant: 'ghost',
+                    }),
+                    'w-full flex gap-2 justify-start font-normal hover:text-indigo-600 group'
+                  )}
                 >
                   <span className=" border rounded-lg p-1 text-gray-400 border-gray-200 group-hover:border-indigo-600 group-hover:text-indigo-600 ">
                     <Icons.User2 size={18} className="text-slate-500 " />
                   </span>
                   friend
-                </Button>
+                </Link>
               ))}
             </div>
           </ScrollArea>
@@ -77,29 +88,31 @@ export async function Sidebar({ className }: SidebarProps) {
           </div>
         </div>
 
-        <div className="mt-auto flex items-center px-1 py-1 bg-slate-50 rounded-md mx-1">
-          <div className="flex flex-1 items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900">
-            <div className="relative h-8 w-8 bg-gray-50">
-              <Image
-                fill
-                referrerPolicy="no-referrer"
-                className="rounded-full"
-                src={session?.user.image || ''}
-                alt="Your profile picture"
-              />
+        <Link href={'/profile'} className="mt-auto group">
+          <div className="flex items-center px-1 py-1 bg-slate-50 group-hover:bg-slate-200 rounded-md mx-1">
+            <div className="flex flex-1 items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900">
+              <div className="relative h-8 w-8 bg-gray-50">
+                <Image
+                  fill
+                  referrerPolicy="no-referrer"
+                  className="rounded-full"
+                  src={session?.user.image || ''}
+                  alt="Your profile picture"
+                />
+              </div>
+
+              <span className="sr-only">Your profile</span>
+              <div className="flex flex-col">
+                <span aria-hidden="true">{session.user.name}</span>
+                <span className="text-xs text-zinc-400" aria-hidden="true">
+                  {session.user.email}
+                </span>
+              </div>
             </div>
 
-            <span className="sr-only">Your profile</span>
-            <div className="flex flex-col">
-              <span aria-hidden="true">{session.user.name}</span>
-              <span className="text-xs text-zinc-400" aria-hidden="true">
-                {session.user.email}
-              </span>
-            </div>
+            <SignOutButton />
           </div>
-
-          <SignOutButton />
-        </div>
+        </Link>
       </div>
     </div>
   );
