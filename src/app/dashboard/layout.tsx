@@ -8,8 +8,8 @@ interface layoutProps {
 const layout: FC<layoutProps> = ({ children }) => {
   return (
     <div className="flex h-screen">
-      <Sidebar className="max-w-xs" />
-      <aside className="flex-1 bg-slate-100">{children}</aside>
+      <Sidebar className="max-w-xs bg-slate-50" />
+      <aside className="flex-1  px-2 py-1">{children}</aside>
     </div>
   );
 };
