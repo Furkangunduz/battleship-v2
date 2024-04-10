@@ -1,12 +1,15 @@
 import { fetchRedis } from '@/helpers/fetch-redis';
 import ApiError from '@/lib/ApiError';
 import ApiResponse from '@/lib/ApiResponse';
+import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { addFriendSchema } from '@/lib/validations/add-friend';
+import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 
 export async function POST(req: Request) {
   try {
+    const session = await getServerSession(authOptions);
     const { email } = await req.json();
     const { email: emailToAdd } = addFriendSchema.parse({ email });
 
@@ -28,6 +31,7 @@ export async function POST(req: Request) {
     }
 
     await db.sadd(`user:${friend.id}:incoming-friend-requests`, friendId);
+    await db.sadd(`user:${session?.user.id}:outgoing-friend-requests`, friend.id);
 
     return new Response(new ApiResponse(200, null, 'Friend Request Sent Succesfully').toJson(), { status: 200 });
   } catch (error) {
