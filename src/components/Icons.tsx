@@ -1,4 +1,19 @@
-import { Loader2, LogOut, User2, UserPlus2, LoaderCircle, LucideProps } from 'lucide-react';
+import { DotsHorizontalIcon } from '@radix-ui/react-icons';
+import {
+  Loader2,
+  LogOut,
+  User2,
+  UserPlus2,
+  LoaderCircle,
+  LucideProps,
+  Cross,
+  X,
+  Check,
+  UserMinus2,
+  ChevronDown,
+  MessageSquareMore,
+  Ship,
+} from 'lucide-react';
 
 export const Icons = {
   User2,
@@ -6,6 +21,13 @@ export const Icons = {
   LogOut,
   UserPlus2,
   LoaderCircle,
+  X,
+  Check,
+  DotsHorizontalIcon,
+  UserMinus2,
+  ChevronDown,
+  MessageSquareMore,
+  Ship,
   Google: (props: LucideProps) => (
     <svg
       {...props}

@@ -26,13 +26,10 @@ const Page: FC = () => {
     try {
       setIsLoading(true);
       const validatedValues = addFriendSchema.parse(values);
-      const response = await axios.post('/api/friends/add', validatedValues);
-      console.log(response);
+      await axios.post('/api/friends/send-friend-request', validatedValues);
 
       setShowSuccesState(true);
     } catch (error) {
-      console.log(error);
-
       if (error instanceof z.ZodError) {
         error.errors.forEach((error) => {
           error.path &&

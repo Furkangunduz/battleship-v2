@@ -4,7 +4,7 @@ import { signOut } from 'next-auth/react';
 import { ButtonHTMLAttributes, FC, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
-import { Icons } from './Icons';
+import { Icons } from '../Icons';
 
 interface SignOutButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {}
 

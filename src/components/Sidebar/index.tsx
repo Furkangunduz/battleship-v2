@@ -1,15 +1,17 @@
 import Image from 'next/image';
-import SignOutButton from './SignOutButton';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { notFound } from 'next/navigation';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
-import SideBarFriendList from './SideBarFriendList';
-import SideBarIncomingFriendRequestOption from './SideBarIncomingFriendRequestOption';
 import { fetchRedis } from '@/helpers/fetch-redis';
-import { Icons } from './Icons';
-import SideBarOutgoingFriendRequestOption from './SideBarOutgoingFriendRequestOption';
+import { Icons } from '../Icons';
+import { getFriends } from '@/helpers/get-friends';
+import SidebarFriendList from './SidebarFriendList';
+import SidebarIncomingFriendRequestOption from './SidebarIncomingFriendRequestOption';
+import SidebarOutgoingFriendRequestOption from './SidebarOutgoingFriendRequestOption';
+import SidebarGameRequestOption from './SidebarGameRequestOption';
+import SignOutButton from './SignOutButton';
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -23,12 +25,14 @@ export async function Sidebar({ className }: SidebarProps) {
   const unSeenOutgoingFriendRequests =
     ((await fetchRedis('smembers', `user:${session.user.id}:outgoing-friend-requests`)) as string[]).length ?? 0;
 
+  const friendList = (await getFriends(session.user.id)) as User[];
+
   return (
     <div className={className}>
       <div className="flex flex-col py-4 px-1 h-full">
         <div className="py-2">
           <h2 className="relative px-7 text-lg font-semibold tracking-tight mb-2">Friends</h2>
-          <SideBarFriendList sessionId={session.user.id} />
+          <SidebarFriendList sessionId={session.user.id} friends={friendList} />
         </div>
 
         <Separator className="px-4" />
@@ -46,9 +50,11 @@ export async function Sidebar({ className }: SidebarProps) {
               <span className="truncate">Add friend</span>
             </Link>
 
-            <SideBarIncomingFriendRequestOption sessionId={session.user.id} unseenRequestCount={unSeenIncomingFriendRequests} />
+            <SidebarIncomingFriendRequestOption sessionId={session.user.id} unseenRequestCount={unSeenIncomingFriendRequests} />
 
-            <SideBarOutgoingFriendRequestOption sessionId={session.user.id} unseenRequestCount={unSeenOutgoingFriendRequests} />
+            <SidebarOutgoingFriendRequestOption sessionId={session.user.id} unseenRequestCount={unSeenOutgoingFriendRequests} />
+
+            <SidebarGameRequestOption sessionId={session.user.id} unseenRequestCount={1} />
           </div>
         </div>
 

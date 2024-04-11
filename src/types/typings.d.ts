@@ -6,3 +6,12 @@ interface SidebarOption {
   href: string;
   Icon: Icon;
 }
+
+interface FriendOption {
+  id: number;
+  label: string;
+  Icon: Icon;
+  onPress?: () => void;
+  separator?: boolean;
+  IconClor?: ClassValue;
+}
