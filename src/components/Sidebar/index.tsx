@@ -36,6 +36,7 @@ export async function Sidebar({ className }: SidebarProps) {
         </div>
 
         <Separator className="px-4" />
+
         <div className="px-3 py-2 mt-2">
           <div className="space-y-1">
             <Link
@@ -57,6 +58,8 @@ export async function Sidebar({ className }: SidebarProps) {
             <SidebarGameRequestOption sessionId={session.user.id} unseenRequestCount={1} />
           </div>
         </div>
+
+        <Separator className="px-4" />
 
         <Link href={'/profile'} className="mt-auto group">
           <div className="flex items-center px-1 py-1 bg-slate-50 group-hover:bg-slate-200 rounded-md mx-1">
