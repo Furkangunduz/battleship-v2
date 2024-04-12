@@ -32,22 +32,16 @@ export async function POST(req: Request) {
       return new Response(new ApiResponse(404, null, 'Friend not found').toJson(), { status: 404 });
     }
 
-    const isFriendRequestExist = (await fetchRedis('sismember', `user:${friend.id}:incoming-friend-requests`, session?.user.id)) as 0 | 1;
+    const isFriend = (await fetchRedis('sismember', `user:${session?.user.id}:friends`, friend.id)) as 0 | 1;
 
-    if (!isFriendRequestExist) {
-      return new Response(new ApiResponse(400, null, 'Friend Request not found').toJson(), { status: 400 });
+    if (!isFriend) {
+      return new Response(new ApiResponse(400, null, 'This user not in your friend list').toJson(), { status: 400 });
     }
 
-    const isAlreadyFriend = (await fetchRedis('sismember', `user:${session?.user.id}:friends`, friend.id)) as 0 | 1;
+    await db.srem(`user:${session?.user.id}:friends`, friend.id);
+    await db.srem(`user:${friend.id}:friends`, session?.user.id);
 
-    if (isAlreadyFriend) {
-      return new Response(new ApiResponse(400, null, 'Already Friends').toJson(), { status: 400 });
-    }
-
-    await db.srem(`user:${session?.user.id}:incoming-friend-requests`, friend.id);
-    await db.srem(`user:${friend.id}:outgoing-friend-requests`, session?.user.id);
-
-    return new Response(new ApiResponse(200, null, 'Friend request denied Succesfully').toJson(), { status: 200 });
+    return new Response(new ApiResponse(200, null, 'Friend Removed Succesfully').toJson(), { status: 200 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return new Response(new ApiError(400, 'Validation Error', error.errors).toJson(), { status: 400 });

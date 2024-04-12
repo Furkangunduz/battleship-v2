@@ -11,7 +11,7 @@ interface FriendOption {
   id: number;
   label: string;
   Icon: Icon;
-  onPress?: () => void;
+  href?: string;
   separator?: boolean;
   IconClor?: ClassValue;
 }
