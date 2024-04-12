@@ -53,7 +53,7 @@ const SideBarFriendListItem: FC<SideBarFriendListItemProps> = ({ friend, session
       case 'Invite to Game':
         break;
       case 'Chat':
-        router.push(option.href + '/' + chatHrefConstructor(option.id.toString(), sessionId));
+        router.push(option.href + '/' + chatHrefConstructor(friend.id, sessionId));
         break;
       case 'Remove Friend':
         setIsDialogOpen(true);

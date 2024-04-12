@@ -5,8 +5,6 @@ import { ScrollArea } from '../ui/scroll-area';
 import SideBarFriendListItem from './SidebarFriendListItem';
 import { pusherClient } from '@/lib/pusher';
 import { PusherEvents, toPusherKey } from '@/lib/utils';
-import { set } from 'zod';
-import toast from 'react-hot-toast';
 
 interface SideBarFriendListProps {
   sessionId: string;
