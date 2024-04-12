@@ -13,10 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { FriendOption } from '@/types/typings';
 import { useRouter } from 'next/navigation';
-import { CopyIcon } from '@radix-ui/react-icons';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import axios, { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 

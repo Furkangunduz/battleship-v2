@@ -3,6 +3,8 @@ import ApiError from '@/lib/ApiError';
 import ApiResponse from '@/lib/ApiResponse';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { pusherServer } from '@/lib/pusher';
+import { PusherEvents, toPusherKey } from '@/lib/utils';
 import { addFriendSchema } from '@/lib/validations/add-friend';
 import { getServerSession } from 'next-auth';
 import { z } from 'zod';
@@ -28,12 +30,15 @@ export async function POST(req: Request) {
       return new Response(new ApiResponse(404, null, 'User not found').toJson(), { status: 404 });
     }
 
-    const isAlreadyFriend = (await fetchRedis('sismember', `user:${friendId}:friends`, friendId)) as 0 | 1;
+    const rawFriend = (await fetchRedis('get', `user:${friendId}`)) as string;
+    const friend = JSON.parse(rawFriend);
+
+    const isAlreadyFriend = (await fetchRedis('sismember', `user:${friend.id}:friends`, friend.id)) as 0 | 1;
     if (isAlreadyFriend) {
       return new Response(new ApiResponse(404, null, 'You Are Already Friend').toJson(), { status: 404 });
     }
 
-    const isFriendRequestAlreadySent = (await fetchRedis('sismember', `user:${friendId}:incoming-friend-requests`, session?.user.id)) as
+    const isFriendRequestAlreadySent = (await fetchRedis('sismember', `user:${friend.id}:incoming-friend-requests`, session?.user.id)) as
       | 0
       | 1;
 
@@ -41,8 +46,11 @@ export async function POST(req: Request) {
       return new Response(new ApiResponse(404, null, 'Friend Request Already Sent').toJson(), { status: 404 });
     }
 
-    await db.sadd(`user:${friendId}:incoming-friend-requests`, session?.user.id);
-    await db.sadd(`user:${session?.user.id}:outgoing-friend-requests`, friendId);
+    await db.sadd(`user:${friend.id}:incoming-friend-requests`, session?.user.id);
+    await db.sadd(`user:${session?.user.id}:outgoing-friend-requests`, friend.id);
+
+    await pusherServer.trigger(toPusherKey(`user:${friendId}:incoming_friend_requests`), PusherEvents.REQUESTS.INCOMING, session.user);
+    await pusherServer.trigger(toPusherKey(`user:${session.user.id}:outgoing_friend_requests`), PusherEvents.REQUESTS.OUTGOING, friend);
 
     return new Response(new ApiResponse(200, null, 'Friend Request Sent Succesfully').toJson(), { status: 200 });
   } catch (error) {

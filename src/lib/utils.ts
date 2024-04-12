@@ -13,3 +13,19 @@ export function chatHrefConstructor(id1: string, id2: string) {
   const sortedIds = [id1, id2].sort();
   return `${sortedIds[0]}--${sortedIds[1]}`;
 }
+
+export const PusherEvents = {
+  REQUESTS: {
+    INCOMING: 'incoming_friend_requests',
+    OUTGOING: 'outgoing_friend_requests',
+    DENY: 'deny_request',
+    ACCEPT: 'accept_request',
+    CANCEL: 'cancel_request',
+  },
+  FRIENDS: {
+    NEW: 'new_friend',
+    REMOVE: 'remove_friend',
+  },
+};
+
+export type PusherRequestEvent = (typeof PusherEvents.REQUESTS)[keyof typeof PusherEvents.REQUESTS];

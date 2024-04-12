@@ -3,6 +3,8 @@ import ApiError from '@/lib/ApiError';
 import ApiResponse from '@/lib/ApiResponse';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { pusherServer } from '@/lib/pusher';
+import { PusherEvents, toPusherKey } from '@/lib/utils';
 import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 
@@ -40,6 +42,9 @@ export async function POST(req: Request) {
 
     await db.srem(`user:${session?.user.id}:friends`, friend.id);
     await db.srem(`user:${friend.id}:friends`, session?.user.id);
+
+    pusherServer.trigger(toPusherKey(`user:${session.user.id}:friends`), PusherEvents.FRIENDS.REMOVE, friend);
+    pusherServer.trigger(toPusherKey(`user:${friend.id}:friends`), PusherEvents.FRIENDS.REMOVE, session.user);
 
     return new Response(new ApiResponse(200, null, 'Friend Removed Succesfully').toJson(), { status: 200 });
   } catch (error) {

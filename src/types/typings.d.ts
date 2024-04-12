@@ -15,3 +15,8 @@ interface FriendOption {
   separator?: boolean;
   IconClor?: ClassValue;
 }
+
+interface IncomingFriendRequest {
+  senderId: string;
+  senderEmail: string;
+}

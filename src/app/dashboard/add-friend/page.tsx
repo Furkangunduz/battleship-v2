@@ -27,7 +27,7 @@ const Page: FC = () => {
     try {
       setIsLoading(true);
       const validatedValues = addFriendSchema.parse(values);
-      await axios.post('/api/friends/send-friend-request', validatedValues);
+      await axios.post('/api/friends/requests/send', validatedValues);
 
       setShowSuccesState(true);
       toast.success('Friend request sent');

@@ -3,6 +3,8 @@ import ApiError from '@/lib/ApiError';
 import ApiResponse from '@/lib/ApiResponse';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { pusherServer } from '@/lib/pusher';
+import { PusherEvents, toPusherKey } from '@/lib/utils';
 import { addFriendSchema } from '@/lib/validations/add-friend';
 import { getServerSession } from 'next-auth';
 import { z } from 'zod';
@@ -40,6 +42,9 @@ export async function POST(req: Request) {
 
     await db.srem(`user:${friend.id}:incoming-friend-requests`, session?.user.id);
     await db.srem(`user:${session?.user.id}:outgoing-friend-requests`, friend.id);
+
+    await pusherServer.trigger(toPusherKey(`user:${friendId}:incoming_friend_requests`), PusherEvents.REQUESTS.CANCEL, session.user);
+    await pusherServer.trigger(toPusherKey(`user:${session.user.id}:outgoing_friend_requests`), PusherEvents.REQUESTS.CANCEL, null);
 
     return new Response(new ApiResponse(200, null, 'Friend Request cancelled Succesfully').toJson(), { status: 200 });
   } catch (error) {

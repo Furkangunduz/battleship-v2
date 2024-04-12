@@ -3,6 +3,8 @@ import ApiError from '@/lib/ApiError';
 import ApiResponse from '@/lib/ApiResponse';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { pusherServer } from '@/lib/pusher';
+import { PusherEvents, toPusherKey } from '@/lib/utils';
 import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 
@@ -32,7 +34,7 @@ export async function POST(req: Request) {
       return new Response(new ApiResponse(404, null, 'Friend not found').toJson(), { status: 404 });
     }
 
-    const isFriendRequestExist = (await fetchRedis('sismember', `user:${friend.id}:incoming-friend-requests`, session?.user.id)) as 0 | 1;
+    const isFriendRequestExist = (await fetchRedis('sismember', `user:${session.user.id}:incoming-friend-requests`, friend.id)) as 0 | 1;
 
     if (!isFriendRequestExist) {
       return new Response(new ApiResponse(400, null, 'Friend Request not found').toJson(), { status: 400 });
@@ -46,6 +48,9 @@ export async function POST(req: Request) {
 
     await db.srem(`user:${session?.user.id}:incoming-friend-requests`, friend.id);
     await db.srem(`user:${friend.id}:outgoing-friend-requests`, session?.user.id);
+
+    await pusherServer.trigger(toPusherKey(`user:${friendId}:incoming_friend_requests`), PusherEvents.REQUESTS.DENY, session.user);
+    await pusherServer.trigger(toPusherKey(`user:${session.user.id}:outgoing_friend_requests`), PusherEvents.REQUESTS.DENY, null);
 
     return new Response(new ApiResponse(200, null, 'Friend request denied Succesfully').toJson(), { status: 200 });
   } catch (error) {

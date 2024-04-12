@@ -1,6 +1,11 @@
-import { FC } from 'react';
+'use client';
+
+import { FC, useEffect, useState } from 'react';
 import { Icons } from '../Icons';
 import Link from 'next/link';
+import { pusherClient } from '@/lib/pusher';
+import { PusherEvents, toPusherKey } from '@/lib/utils';
+import toast from 'react-hot-toast';
 
 interface SideBarIncomingFriendRequestOptionProps {
   sessionId?: string;
@@ -8,6 +13,44 @@ interface SideBarIncomingFriendRequestOptionProps {
 }
 
 const SideBarIncomingFriendRequestOption: FC<SideBarIncomingFriendRequestOptionProps> = ({ sessionId, unseenRequestCount }) => {
+  const [count, setCount] = useState<number>(unseenRequestCount);
+
+  useEffect(() => {
+    pusherClient.subscribe(toPusherKey(`user:${sessionId}:incoming_friend_requests`));
+
+    const friendRequestHandler = (user: User) => {
+      if (user.id) {
+        toast.success(`${user.name} has sent you a friend request`);
+        setCount((prev) => prev + 1);
+      }
+    };
+
+    const denyHandler = () => {
+      setCount((prev) => prev - 1);
+    };
+
+    const cancelHandler = () => {
+      setCount((prev) => prev - 1);
+    };
+
+    const acceptHandler = () => {
+      setCount((prev) => prev - 1);
+    };
+
+    pusherClient.bind(PusherEvents.REQUESTS.INCOMING, friendRequestHandler);
+    pusherClient.bind(PusherEvents.REQUESTS.DENY, denyHandler);
+    pusherClient.bind(PusherEvents.REQUESTS.CANCEL, cancelHandler);
+    pusherClient.bind(PusherEvents.REQUESTS.ACCEPT, acceptHandler);
+
+    return () => {
+      pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:incoming_friend_requests`));
+      pusherClient.unbind(PusherEvents.REQUESTS.INCOMING, friendRequestHandler);
+      pusherClient.unbind(PusherEvents.REQUESTS.DENY, denyHandler);
+      pusherClient.unbind(PusherEvents.REQUESTS.CANCEL, cancelHandler);
+      pusherClient.unbind(PusherEvents.REQUESTS.ACCEPT, acceptHandler);
+    };
+  }, [sessionId]);
+
   return (
     <Link
       href={'/dashboard/incoming-friend-requests'}
@@ -19,9 +62,7 @@ const SideBarIncomingFriendRequestOption: FC<SideBarIncomingFriendRequestOptionP
 
       <span className="truncate">Incoming Friend Request</span>
 
-      {unseenRequestCount > 0 && (
-        <span className="text-xs bg-indigo-500 text-white size-5 rounded-full flex items-center justify-center">{unseenRequestCount}</span>
-      )}
+      {count > 0 && <span className="text-xs bg-indigo-500 text-white size-5 rounded-full flex items-center justify-center">{count}</span>}
     </Link>
   );
 };
