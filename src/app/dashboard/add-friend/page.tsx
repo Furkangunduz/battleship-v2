@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { addFriendSchema, AddFriendFormValues } from '@/lib/validations/add-friend';
 import axios, { AxiosError } from 'axios';
 import { Icons } from '@/components/Icons';
+import toast from 'react-hot-toast';
 
 const Page: FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +30,10 @@ const Page: FC = () => {
       await axios.post('/api/friends/send-friend-request', validatedValues);
 
       setShowSuccesState(true);
+      toast.success('Friend request sent');
     } catch (error) {
+      toast.error('Failed to send friend request');
+
       if (error instanceof z.ZodError) {
         error.errors.forEach((error) => {
           error.path &&
@@ -41,6 +45,7 @@ const Page: FC = () => {
         });
         return;
       }
+
       if (error instanceof AxiosError) {
         setError('email', { message: error.response?.data.message });
         return;

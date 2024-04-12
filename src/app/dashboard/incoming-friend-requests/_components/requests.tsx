@@ -5,6 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import axios, { AxiosError } from 'axios';
 import { Icons } from '@/components/Icons';
+import toast from 'react-hot-toast';
 
 interface RequestsProps {
   requests: User[];
@@ -34,12 +35,14 @@ const Requests: FC<RequestsProps> = ({ requests }) => {
                 onClick={async () => {
                   try {
                     setIsCheckLoading(true);
-                    await axios.post('/api/friends/accept-friend-request', { friendId: friend.id });
+                    await axios.post('/api/friends/requests/accept', { friendId: friend.id });
                     setItems((prev) => prev.filter((item) => item.id !== friend.id));
+                    toast.success('Friend request accepted');
                   } catch (error) {
                     if (error instanceof AxiosError) {
                       console.error(error.response?.data);
                     }
+                    toast.error('Failed to accept friend request');
                   } finally {
                     setIsCheckLoading(false);
                   }
@@ -52,12 +55,14 @@ const Requests: FC<RequestsProps> = ({ requests }) => {
                 onClick={async () => {
                   try {
                     setIsXLoading(true);
-                    await axios.post('/api/friends/deny-friend-request', { friendId: friend.id });
+                    await axios.post('/api/friends/requests/deny', { friendId: friend.id });
                     setItems((prev) => prev.filter((item) => item.id !== friend.id));
+                    toast.success('Friend request denied');
                   } catch (error) {
                     if (error instanceof AxiosError) {
                       console.error(error.response?.data);
                     }
+                    toast.error('Failed to deny friend request');
                   } finally {
                     setIsXLoading(false);
                   }

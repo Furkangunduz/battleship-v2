@@ -32,7 +32,7 @@ const Requests: FC<RequestsProps> = ({ requests }) => {
               onClick={async () => {
                 try {
                   setIsLoading(true);
-                  await axios.post('/api/friends/cancel-friend-request', { friendId: friend.id });
+                  await axios.post('/api/friends/requests/cancel', { friendId: friend.id });
                   setItems((prev) => prev.filter((item) => item.id !== friend.id));
                 } catch (error) {
                   if (error instanceof AxiosError) {
