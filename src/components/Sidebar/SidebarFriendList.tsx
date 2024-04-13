@@ -33,10 +33,11 @@ const SideBarFriendList: FC<SideBarFriendListProps> = ({ sessionId, friends }) =
       pusherClient.unbind(PusherEvents.FRIENDS.REMOVE, removeHandler);
     };
   }, [sessionId, items, setItems]);
+
   return (
     <ScrollArea className="max-h-[350px] px-1">
       <div className="space-y-1 p-2">
-        {items && items.length === 0 && <p className="text-gray-400 text-sm font-normal pl-4">You have no friends yet</p>}
+        {items && items.length === 0 && <p className="pl-4 text-sm font-normal text-gray-400">You have no friends yet</p>}
 
         {items && items.map((friend, i) => <SideBarFriendListItem key={friend.id} friend={friend} sessionId={sessionId} />)}
       </div>

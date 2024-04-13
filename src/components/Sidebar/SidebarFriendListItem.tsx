@@ -115,9 +115,9 @@ const SideBarFriendListItem: FC<SideBarFriendListItemProps> = ({ friend, session
           href={`/dashboard/friend/${friend.id}`}
         >
           <span className="flex items-center gap-2">
-            <span className="rounded-lg border border-gray-200 p-1 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600">
+            <span className="rounded-2xl border border-gray-200 p-1 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600">
               {friend.image ? (
-                <Image width={20} height={20} src={friend.image} alt={friend.name} className="rounded-full" />
+                <Image width={20} height={20} src={friend.image} alt={friend.name} className="size-7 rounded-full" />
               ) : (
                 <Icons.User2 size={18} className="text-slate-500" />
               )}
