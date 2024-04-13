@@ -1,4 +1,5 @@
 "use client";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { pusherClient } from "@/lib/pusher";
@@ -6,12 +7,12 @@ import { chatHrefConstructor, cn, PusherEvents, toPusherKey } from "@/lib/utils"
 import { Message } from "@/lib/validations/message";
 import { FriendOption } from "@/types/typings";
 import axios, { AxiosError } from "axios";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FC, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Icons } from "../Icons";
-import { Button, buttonVariants } from "../ui/button";
 
 interface SideBarFriendListItemProps {
   friend: User;
@@ -109,18 +110,22 @@ const SideBarFriendListItem: FC<SideBarFriendListItemProps> = ({ friend, session
         )}
       >
         <Link
-          className="w-full flex gap-2 justify-between items-center font-normal hover:text-indigo-600"
+          className="flex w-full items-center justify-between gap-2 font-normal hover:text-indigo-600"
           key={`$friend-${friend.id}`}
           href={`/dashboard/friend/${friend.id}`}
         >
-          <span className="flex gap-2 items-center">
-            <span className=" border rounded-lg p-1 text-gray-400 border-gray-200 group-hover:border-indigo-600 group-hover:text-indigo-600 ">
-              <Icons.User2 size={18} className="text-slate-500 " />
+          <span className="flex items-center gap-2">
+            <span className="rounded-lg border border-gray-200 p-1 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600">
+              {friend.image ? (
+                <Image width={20} height={20} src={friend.image} alt={friend.name} className="rounded-full" />
+              ) : (
+                <Icons.User2 size={18} className="text-slate-500" />
+              )}
             </span>
             <span className="truncate">{friend.name}</span>
 
             {unSeendMessageCount > 0 && (
-              <span className="text-xs bg-indigo-500 text-white size-5 rounded-full flex items-center justify-center">{unSeendMessageCount}</span>
+              <span className="flex size-5 items-center justify-center rounded-full bg-indigo-500 text-xs text-white">{unSeendMessageCount}</span>
             )}
           </span>
         </Link>
@@ -140,7 +145,7 @@ const SideBarFriendListItem: FC<SideBarFriendListItemProps> = ({ friend, session
                       optionClickHandler(option);
                     }}
                   >
-                    <Button variant={"ghost"} className="p-0 gap-2 w-full items-center justify-start">
+                    <Button variant={"ghost"} className="w-full items-center justify-start gap-2 p-0">
                       <span className="ml-2">{option.label}</span>
                       <Icon className={cn("size-4", option?.IconClor)} />
                     </Button>
