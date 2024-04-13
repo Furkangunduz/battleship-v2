@@ -12,7 +12,7 @@ const page: FC<pageProps> = async ({}) => {
   const session = await getServerSession(authOptions);
   if (!session) notFound();
   return (
-    <div className="mt-6 max-w-md">
+    <div className="mt-6 max-w-md xl:mx-auto">
       <h1 className="mb-5 text-2xl font-medium">Profile </h1>
 
       <Separator className="w-full" />
