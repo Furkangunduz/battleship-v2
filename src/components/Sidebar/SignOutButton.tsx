@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { signOut } from 'next-auth/react';
-import { ButtonHTMLAttributes, FC, useState } from 'react';
-import { toast } from 'react-hot-toast';
-import { Button } from '@/components/ui/button';
-import { Icons } from '../Icons';
+import { Button } from "@/components/ui/button";
+import { signOut } from "next-auth/react";
+import { ButtonHTMLAttributes, FC, useState } from "react";
+import { toast } from "react-hot-toast";
+import { Icons } from "../Icons";
 
 interface SignOutButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {}
 
@@ -14,19 +14,19 @@ const SignOutButton: FC<SignOutButtonProps> = ({ ...props }) => {
   return (
     <Button
       {...props}
-      variant={'ghost'}
+      variant={"ghost"}
       onClick={async () => {
         setIsSigningOut(true);
         try {
           await signOut();
         } catch (error) {
-          toast.error('There was a problem signing out');
+          toast.error("There was a problem signing out");
         } finally {
           setIsSigningOut(false);
         }
       }}
     >
-      {isSigningOut ? <Icons.Loader2 className="animate-spin h-4 w-4" /> : <Icons.LogOut className="w-4 h-4" />}
+      {isSigningOut ? <Icons.Loader2 className="h-4 w-4 animate-spin" /> : <Icons.LogOut className="h-4 w-4" />}
     </Button>
   );
 };

@@ -1,19 +1,18 @@
-import { DotsHorizontalIcon } from '@radix-ui/react-icons';
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import {
-  Loader2,
-  LogOut,
-  User2,
-  UserPlus2,
-  LoaderCircle,
-  LucideProps,
-  Cross,
-  X,
   Check,
-  UserMinus2,
   ChevronDown,
+  Loader2,
+  LoaderCircle,
+  LogOut,
+  LucideProps,
   MessageSquareMore,
   Ship,
-} from 'lucide-react';
+  User2,
+  UserMinus2,
+  UserPlus2,
+  X,
+} from "lucide-react";
 
 export const Icons = {
   User2,

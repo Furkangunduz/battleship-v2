@@ -1,10 +1,10 @@
-import { getOutGoingFriendRequests } from '@/helpers/get-outgoing-friend-requests';
-import { authOptions } from '@/lib/auth';
+import { getOutGoingFriendRequests } from "@/helpers/get-outgoing-friend-requests";
+import { authOptions } from "@/lib/auth";
 
-import { getServerSession } from 'next-auth';
-import { notFound } from 'next/navigation';
-import { FC } from 'react';
-import Requests from './_components/requests';
+import { getServerSession } from "next-auth";
+import { notFound } from "next/navigation";
+import { FC } from "react";
+import Requests from "./_components/requests";
 
 interface pageProps {}
 
@@ -16,7 +16,7 @@ const page: FC<pageProps> = async ({}) => {
 
   return (
     <div className="mt-6">
-      <h1 className="text-2xl font-medium mb-5">Outgoing Friend Requests</h1>
+      <h1 className="mb-5 text-2xl font-medium">Outgoing Friend Requests</h1>
 
       {requests.length > 0 ? (
         <Requests requests={requests} sessionId={session.user.id} />

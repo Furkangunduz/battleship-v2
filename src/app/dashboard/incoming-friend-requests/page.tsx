@@ -1,11 +1,11 @@
-import { authOptions } from '@/lib/auth';
+import { authOptions } from "@/lib/auth";
 
-import { getServerSession } from 'next-auth';
-import { notFound } from 'next/navigation';
-import { FC } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { getIncomingFriendRequests } from '@/helpers/get-incoming-friend-requests';
-import Requests from './_components/requests';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { getIncomingFriendRequests } from "@/helpers/get-incoming-friend-requests";
+import { getServerSession } from "next-auth";
+import { notFound } from "next/navigation";
+import { FC } from "react";
+import Requests from "./_components/requests";
 
 interface pageProps {}
 
@@ -17,10 +17,10 @@ const page: FC<pageProps> = async ({}) => {
 
   return (
     <div className="mt-6">
-      <h1 className="text-2xl font-medium mb-5">Incoming Friend Requests</h1>
+      <h1 className="mb-5 text-2xl font-medium">Incoming Friend Requests</h1>
 
       {requests.length > 0 ? (
-        <ScrollArea className="max-h-screen flex flex-col">
+        <ScrollArea className="flex max-h-screen flex-col">
           <div className="flex flex-col gap-5 p-2">
             <Requests requests={requests} sessionId={session.user.id} />
           </div>

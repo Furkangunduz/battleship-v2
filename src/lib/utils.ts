@@ -26,6 +26,10 @@ export const PusherEvents = {
     NEW: 'new_friend',
     REMOVE: 'remove_friend',
   },
+  MESSAGES: {
+    INCOMING: 'incoming_message',
+    NEW: 'new_message',
+  },
 };
 
 export type PusherRequestEvent = (typeof PusherEvents.REQUESTS)[keyof typeof PusherEvents.REQUESTS];

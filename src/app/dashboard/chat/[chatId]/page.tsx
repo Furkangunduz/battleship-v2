@@ -1,12 +1,13 @@
-import ChatInput from '@/components/ChatInput';
-import Messages from '@/components/Messages';
-import { getPreviousChatMessagesByChatId } from '@/helpers/get-previous-chat-messages-by-chat-id';
-import { getUserById } from '@/helpers/get-user-by-id';
-import { authOptions } from '@/lib/auth';
-import { Message } from '@/lib/validations/message';
-import { getServerSession } from 'next-auth';
-import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import ChatInput from "@/components/Chat/ChatInput";
+import Messages from "@/components/Chat/Messages";
+import { getPreviousChatMessagesByChatId } from "@/helpers/get-previous-chat-messages-by-chat-id";
+import { getUserById } from "@/helpers/get-user-by-id";
+import { authOptions } from "@/lib/auth";
+import { Message } from "@/lib/validations/message";
+import { getServerSession } from "next-auth";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 interface PageProps {
   params: {
@@ -21,7 +22,7 @@ const page = async ({ params }: PageProps) => {
 
   const { user } = session;
 
-  const [userId1, userId2] = chatId.split('--');
+  const [userId1, userId2] = chatId.split("--");
 
   if (user.id !== userId1 && user.id !== userId2) {
     notFound();
@@ -33,29 +34,23 @@ const page = async ({ params }: PageProps) => {
   const initialMessages = (await getPreviousChatMessagesByChatId(chatId)) as Message[];
 
   return (
-    <div className="flex-1 justify-between flex flex-col h-full max-h-[calc(100vh-6rem)]">
-      <div className="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">
-        <div className="relative flex items-center space-x-4">
+    <div className="flex h-full max-h-[calc(100vh-3rem)] flex-1 flex-col justify-between">
+      <div className="flex justify-between border-b-2 border-gray-200 py-3 sm:items-center">
+        <Link href={`/dashboard/friend/${chatPartnerId}`} className="relative flex items-center space-x-4">
           <div className="relative">
-            <div className="relative w-8 sm:w-12 h-8 sm:h-12">
-              <Image
-                fill
-                referrerPolicy="no-referrer"
-                src={chatPartner.image}
-                alt={`${chatPartner.name} profile picture`}
-                className="rounded-full"
-              />
+            <div className="relative h-8 w-8 sm:h-12 sm:w-12">
+              <Image fill referrerPolicy="no-referrer" src={chatPartner.image} alt={`${chatPartner.name} profile picture`} className="rounded-full" />
             </div>
           </div>
 
           <div className="flex flex-col leading-tight">
-            <div className="text-xl flex items-center">
-              <span className="text-gray-700 mr-3 font-semibold">{chatPartner.name}</span>
+            <div className="flex items-center text-xl">
+              <span className="mr-3 font-semibold text-gray-700">{chatPartner.name}</span>
             </div>
 
             <span className="text-sm text-gray-600">{chatPartner.email}</span>
           </div>
-        </div>
+        </Link>
       </div>
 
       <Messages

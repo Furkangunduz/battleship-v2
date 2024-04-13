@@ -1,21 +1,17 @@
-'use client';
-import { chatHrefConstructor, cn } from '@/lib/utils';
-import { FC, useState } from 'react';
-import { Button, buttonVariants } from '../ui/button';
-import { Icons } from '../Icons';
-import Link from 'next/link';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { FriendOption } from '@/types/typings';
-import { useRouter } from 'next/navigation';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import axios, { AxiosError } from 'axios';
-import toast from 'react-hot-toast';
+"use client";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { pusherClient } from "@/lib/pusher";
+import { chatHrefConstructor, cn, PusherEvents, toPusherKey } from "@/lib/utils";
+import { Message } from "@/lib/validations/message";
+import { FriendOption } from "@/types/typings";
+import axios, { AxiosError } from "axios";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { FC, useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { Icons } from "../Icons";
+import { Button, buttonVariants } from "../ui/button";
 
 interface SideBarFriendListItemProps {
   friend: User;
@@ -25,37 +21,41 @@ interface SideBarFriendListItemProps {
 const friendOptions: FriendOption[] = [
   {
     id: 1,
-    label: 'Invite to Game',
-    Icon: 'Ship',
+    label: "Invite to Game",
+    Icon: "Ship",
   },
   {
     id: 2,
-    label: 'Chat',
-    Icon: 'MessageSquareMore',
+    label: "Chat",
+    Icon: "MessageSquareMore",
     separator: true,
-    href: '/dashboard/chat',
+    href: "/dashboard/chat",
   },
   {
     id: 3,
-    label: 'Remove Friend',
-    Icon: 'UserMinus2',
-    IconClor: 'text-red-500',
+    label: "Remove Friend",
+    Icon: "UserMinus2",
+    IconClor: "text-red-500",
   },
 ];
 
 const SideBarFriendListItem: FC<SideBarFriendListItemProps> = ({ friend, sessionId }) => {
   const router = useRouter();
+  const pathname = usePathname();
+
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [unSeendMessageCount, setUnSeendMessageCount] = useState<number>(0);
 
   function optionClickHandler(option: FriendOption) {
     switch (option.label) {
-      case 'Invite to Game':
+      case "Invite to Game":
         break;
-      case 'Chat':
-        router.push(option.href + '/' + chatHrefConstructor(friend.id, sessionId));
+      case "Chat":
+        setUnSeendMessageCount(0);
+        router.push(option.href + "/" + chatHrefConstructor(friend.id, sessionId));
         break;
-      case 'Remove Friend':
+      case "Remove Friend":
         setIsDialogOpen(true);
         break;
     }
@@ -63,31 +63,49 @@ const SideBarFriendListItem: FC<SideBarFriendListItemProps> = ({ friend, session
 
   async function removeFriend(friendId: string) {
     try {
-      setLoading(true);
-      await axios.post('/api/friends/remove', { friendId });
-      toast.success('Friend removed successfully');
+      setIsLoading(true);
+      await axios.post("/api/friends/remove", { friendId });
+      toast.success("Friend removed successfully");
     } catch (error) {
-      toast.error('Failed to remove friend');
+      toast.error("Failed to remove friend");
       if (error instanceof AxiosError) {
         console.error(error.response?.data);
-
         return;
       }
-
       console.error(error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
+      setIsDialogOpen(false);
     }
   }
+
+  useEffect(() => {
+    pusherClient.subscribe(toPusherKey(`user:${sessionId}:chats`));
+
+    const newMessageHandler = (message: Message) => {
+      if (pathname?.includes("chat")) return;
+      if (message.senderId === friend.id) {
+        setUnSeendMessageCount((prev) => prev + 1);
+        toast.success("New message from " + friend.name);
+      }
+    };
+
+    pusherClient.bind(PusherEvents.MESSAGES.NEW, newMessageHandler);
+
+    return () => {
+      pusherClient.unbind(PusherEvents.MESSAGES.NEW, newMessageHandler);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, pathname]);
 
   return (
     <>
       <span
         className={cn(
           buttonVariants({
-            variant: 'ghost',
+            variant: "ghost",
           }),
-          ' group w-full'
+          " group w-full"
         )}
       >
         <Link
@@ -100,6 +118,10 @@ const SideBarFriendListItem: FC<SideBarFriendListItemProps> = ({ friend, session
               <Icons.User2 size={18} className="text-slate-500 " />
             </span>
             <span className="truncate">{friend.name}</span>
+
+            {unSeendMessageCount > 0 && (
+              <span className="text-xs bg-indigo-500 text-white size-5 rounded-full flex items-center justify-center">{unSeendMessageCount}</span>
+            )}
           </span>
         </Link>
         <DropdownMenu>
@@ -118,9 +140,9 @@ const SideBarFriendListItem: FC<SideBarFriendListItemProps> = ({ friend, session
                       optionClickHandler(option);
                     }}
                   >
-                    <Button variant={'ghost'} className="p-0 gap-2 w-full items-center justify-start">
+                    <Button variant={"ghost"} className="p-0 gap-2 w-full items-center justify-start">
                       <span className="ml-2">{option.label}</span>
-                      <Icon className={cn('size-4', option?.IconClor)} />
+                      <Icon className={cn("size-4", option?.IconClor)} />
                     </Button>
                   </DropdownMenuItem>
                   {option?.separator && (
@@ -153,12 +175,11 @@ const SideBarFriendListItem: FC<SideBarFriendListItemProps> = ({ friend, session
             <DialogClose
               asChild
               onClick={() => {
-                setIsDialogOpen(false);
                 removeFriend(friend.id);
               }}
             >
-              <Button type="button" variant="secondary" className="bg-red-400 text-white">
-                I am sure
+              <Button type="button" variant="secondary" className="bg-red-500 text-white hover:bg-red-400">
+                {isLoading ? <Icons.LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : "delete"}
               </Button>
             </DialogClose>
           </DialogFooter>

@@ -2,7 +2,7 @@ import { fetchRedis } from '@/helpers/fetch-redis';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { pusherServer } from '@/lib/pusher';
-import { toPusherKey } from '@/lib/utils';
+import { PusherEvents, toPusherKey } from '@/lib/utils';
 import { Message, messageValidator } from '@/lib/validations/message';
 import { nanoid } from 'nanoid';
 import { getServerSession } from 'next-auth';
@@ -43,9 +43,8 @@ export async function POST(req: Request) {
 
     const message = messageValidator.parse(messageData);
 
-    await pusherServer.trigger(toPusherKey(`chat:${chatId}`), 'incoming-message', message);
-
-    await pusherServer.trigger(toPusherKey(`user:${friendId}:chats`), 'new_message', {
+    await pusherServer.trigger(toPusherKey(`chat:${chatId}`), PusherEvents.MESSAGES.INCOMING, message);
+    await pusherServer.trigger(toPusherKey(`user:${friendId}:chats`), PusherEvents.MESSAGES.NEW, {
       ...message,
       senderImg: sender.image,
       senderName: sender.name,

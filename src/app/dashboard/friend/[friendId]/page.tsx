@@ -1,7 +1,6 @@
-import { authOptions } from '@/lib/auth';
-import { getServerSession } from 'next-auth';
-import { notFound } from 'next/navigation';
-import { FC } from 'react';
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { notFound } from "next/navigation";
 
 interface pageProps {
   params: {

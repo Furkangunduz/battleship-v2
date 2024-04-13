@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { FC, useEffect, useState } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import Image from 'next/image';
-import axios, { AxiosError } from 'axios';
-import { Icons } from '@/components/Icons';
-import { pusherClient } from '@/lib/pusher';
-import { PusherEvents, toPusherKey } from '@/lib/utils';
-import toast from 'react-hot-toast';
+import { Icons } from "@/components/Icons";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { pusherClient } from "@/lib/pusher";
+import { PusherEvents, toPusherKey } from "@/lib/utils";
+import axios, { AxiosError } from "axios";
+import Image from "next/image";
+import { FC, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 interface RequestsProps {
   requests: User[];
@@ -52,12 +52,12 @@ const Requests: FC<RequestsProps> = ({ requests, sessionId }) => {
   }, [sessionId]);
 
   return (
-    <ScrollArea className="max-h-screen flex flex-col">
+    <ScrollArea className="flex max-h-screen flex-col">
       <div className="flex flex-col gap-5 p-2">
         {items.map((friend) => (
-          <div key={friend.id} className="flex gap-5 items-center">
-            <div className="flex-shrink-0 h-8 w-8 rounded-full overflow-hidden relative">
-              <Image fill referrerPolicy="no-referrer" className="rounded-full" src={friend.image || ''} alt={friend.name + ' image'} />
+          <div key={friend.id} className="flex items-center gap-5">
+            <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-full">
+              <Image fill referrerPolicy="no-referrer" className="rounded-full" src={friend.image || ""} alt={friend.name + " image"} />
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold">{friend.name}</span>
@@ -65,13 +65,13 @@ const Requests: FC<RequestsProps> = ({ requests, sessionId }) => {
             </div>
 
             <button
-              className="bg-red-500 hover:bg-red-600 text-white font-bold p-1 rounded"
+              className="rounded bg-red-500 p-1 font-bold text-white hover:bg-red-600"
               onClick={async () => {
                 try {
                   setIsLoading(true);
-                  await axios.post('/api/friends/requests/cancel', { friendId: friend.id });
+                  await axios.post("/api/friends/requests/cancel", { friendId: friend.id });
                   setItems((prev) => prev.filter((item) => item.id !== friend.id));
-                  toast.success('Friend request canceled successfully');
+                  toast.success("Friend request canceled successfully");
                 } catch (error) {
                   if (error instanceof AxiosError) {
                     console.error(error.response?.data);

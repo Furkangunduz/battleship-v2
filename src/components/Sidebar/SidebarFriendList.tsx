@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { FC, useEffect, useState } from 'react';
-import { ScrollArea } from '../ui/scroll-area';
-import SideBarFriendListItem from './SidebarFriendListItem';
-import { pusherClient } from '@/lib/pusher';
-import { PusherEvents, toPusherKey } from '@/lib/utils';
+import { pusherClient } from "@/lib/pusher";
+import { PusherEvents, toPusherKey } from "@/lib/utils";
+import { FC, useEffect, useState } from "react";
+import { ScrollArea } from "../ui/scroll-area";
+import SideBarFriendListItem from "./SidebarFriendListItem";
 
 interface SideBarFriendListProps {
   sessionId: string;
