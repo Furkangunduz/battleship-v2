@@ -44,20 +44,22 @@ const SideBarFriendListItem: FC<SideBarFriendListItemProps> = ({ friend, session
   const router = useRouter();
   const pathname = usePathname();
 
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [isRemoveFriendDialogOpen, setIsRemoveDialogOpen] = useState<boolean>(false);
+  const [isInviteGameDialogOpen, setIsInviteGameDialogOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [unSeendMessageCount, setUnSeendMessageCount] = useState<number>(0);
 
   function optionClickHandler(option: FriendOption) {
     switch (option.label) {
       case "Invite to Game":
+        setIsInviteGameDialogOpen(true);
         break;
       case "Chat":
         setUnSeendMessageCount(0);
         router.push(option.href + "/" + chatHrefConstructor(friend.id, sessionId));
         break;
       case "Remove Friend":
-        setIsDialogOpen(true);
+        setIsRemoveDialogOpen(true);
         break;
     }
   }
@@ -76,7 +78,24 @@ const SideBarFriendListItem: FC<SideBarFriendListItemProps> = ({ friend, session
       console.error(error);
     } finally {
       setIsLoading(false);
-      setIsDialogOpen(false);
+      setIsRemoveDialogOpen(false);
+    }
+  }
+
+  async function sendInvite(friendId: string) {
+    try {
+      setIsLoading(true);
+      await axios.post("/api/game/invite", { friendId });
+      toast.success("Invite sent successfully");
+    } catch (error) {
+      toast.error("Failed to send invite");
+      if (error instanceof AxiosError) {
+        console.error(error.response?.data);
+        return;
+      }
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -162,10 +181,11 @@ const SideBarFriendListItem: FC<SideBarFriendListItemProps> = ({ friend, session
         </DropdownMenu>
       </span>
 
+      {/* Remove Friend Dialog  */}
       <Dialog
-        open={isDialogOpen}
+        open={isRemoveFriendDialogOpen}
         onOpenChange={(open) => {
-          setIsDialogOpen(open);
+          setIsRemoveDialogOpen(open);
         }}
       >
         <DialogContent className="sm:max-w-md">
@@ -187,6 +207,38 @@ const SideBarFriendListItem: FC<SideBarFriendListItemProps> = ({ friend, session
                 {isLoading ? <Icons.LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : "delete"}
               </Button>
             </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invite Game Dialog */}
+      <Dialog
+        open={isInviteGameDialogOpen}
+        onOpenChange={(open) => {
+          setIsInviteGameDialogOpen(open);
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Invite Game</DialogTitle>
+          </DialogHeader>
+
+          <div>
+            Invite will be sent to <span className="font-semibold">{friend.name}</span>. When they accept, you will be able to play games together.
+          </div>
+
+          <DialogFooter className="sm:justify-end">
+            <Button
+              type="button"
+              variant="secondary"
+              className="bg-green-500 hover:bg-green-600 text-white"
+              onClick={() => {
+                setIsInviteGameDialogOpen(false);
+                sendInvite(friend.id);
+              }}
+            >
+              Send Invite
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
