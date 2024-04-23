@@ -20,8 +20,8 @@ export async function Sidebar({ className }: SidebarProps) {
   if (!session) notFound();
 
   const unSeenIncomingFriendRequests = ((await fetchRedis("smembers", `user:${session.user.id}:incoming-friend-requests`)) as string[]).length ?? 0;
-
   const unSeenOutgoingFriendRequests = ((await fetchRedis("smembers", `user:${session.user.id}:outgoing-friend-requests`)) as string[]).length ?? 0;
+  const unSeenGameRequests = ((await fetchRedis("smembers", `user:${session.user.id}:incoming-game-requests`)) as string[]).length ?? 0;
 
   const friendList = (await getFriends(session.user.id)) as User[];
 
@@ -61,7 +61,7 @@ export async function Sidebar({ className }: SidebarProps) {
 
             <SidebarOutgoingFriendRequestOption sessionId={session.user.id} unseenRequestCount={unSeenOutgoingFriendRequests} />
 
-            <SidebarGameRequestOption sessionId={session.user.id} unseenRequestCount={1} />
+            <SidebarGameRequestOption sessionId={session.user.id} unseenRequestCount={unSeenGameRequests} />
           </div>
         </div>
 

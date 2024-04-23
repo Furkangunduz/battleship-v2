@@ -1,5 +1,10 @@
+"use client";
+
+import { pusherClient } from "@/lib/pusher";
+import { PusherEvents, toPusherKey } from "@/lib/utils";
 import Link from "next/link";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { Icons } from "../Icons";
 
 interface SideBarGameRequestOptionProps {
@@ -7,7 +12,36 @@ interface SideBarGameRequestOptionProps {
   unseenRequestCount: number;
 }
 
-const SideBarGameRequestOption: FC<SideBarGameRequestOptionProps> = ({ unseenRequestCount }) => {
+const SideBarGameRequestOption: FC<SideBarGameRequestOptionProps> = ({ unseenRequestCount, sessionId }) => {
+  const [count, setCount] = useState<number>(unseenRequestCount);
+
+  useEffect(() => {
+    pusherClient.subscribe(toPusherKey(`user:${sessionId}:incoming_game_requests`));
+    pusherClient.subscribe(toPusherKey(`user:${sessionId}:outgoing_game_requests`));
+
+    const gameRequestHandler = (user: User) => {
+      if (user.id) {
+        toast.success(`${user.name} has sent you a game request`);
+        setCount((prev) => prev + 1);
+      }
+    };
+
+    const denyHandler = (user: User) => {
+      toast.error(`Game request denied by ${user.name}`);
+      setCount((prev) => prev - 1);
+    };
+
+    pusherClient.bind(PusherEvents.GAME.DENY, denyHandler);
+    pusherClient.bind(PusherEvents.GAME.INCOMING, gameRequestHandler);
+
+    return () => {
+      pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:incoming_game_requests`));
+      pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:outgoing_game_requests`));
+      pusherClient.unbind(PusherEvents.GAME.INCOMING, gameRequestHandler);
+      pusherClient.unbind(PusherEvents.GAME.DENY, denyHandler);
+    };
+  }, [sessionId]);
+
   return (
     <Link
       href={"/dashboard/game-requests"}
@@ -19,9 +53,7 @@ const SideBarGameRequestOption: FC<SideBarGameRequestOptionProps> = ({ unseenReq
 
       <span className="truncate">Game Requests</span>
 
-      {unseenRequestCount > 0 && (
-        <span className="flex size-5 items-center justify-center rounded-full bg-indigo-500 text-xs text-white">{unseenRequestCount}</span>
-      )}
+      {count > 0 && <span className="flex size-5 items-center justify-center rounded-full bg-indigo-500 text-xs text-white">{count}</span>}
     </Link>
   );
 };
